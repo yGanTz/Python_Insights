@@ -1,0 +1,69 @@
+# Python Insights - Analisando Dados com Python
+
+### Case - Cancelamento de Clientes
+
+///Você foi contratado por uma empresa com mais de 800 mil clientes para um projeto de Dados. Recentemente a empresa percebeu que da sua base total de clientes, a maioria são clientes inativos, ou seja, que já cancelaram o serviço.
+Precisando melhorar seus resultados ela quer conseguir entender os principais motivos desses cancelamentos e quais as ações mais eficientes para reduzir esse número.///
+
+Base de dados e arquivos: https://drive.google.com/drive/folders/1uDesZePdkhiraJmiyeZ-w5tfc8XsNYFZ?usp=drive_link
+
+# Passo 1: Importar a base de daos
+# !pip install pandas numpy openpyxl nbformat ipykernel plotly
+
+import pandas as pd
+
+tabela = pd.read_csv("cancelamentos.csv")
+
+# Passo 2: Visualizar a base de dados
+    #entender quais informações eu tenho disponiveis
+    #procurar os problemas da base de dados
+
+#colunas inuteis - info que não te ajuda, atrapalha
+tabela = tabela.drop(columns="CustomerID")
+display(tabela)
+
+# Passo 3: corrigir os problemas da base de dados
+
+# informações vazias ou no formato errado
+display(tabela.info())
+tabela = tabela.dropna()  #NaN - Not a Number - informações vazias
+display(tabela.info())
+
+# Passo 4: Analise dos cancelamentos(quantos cancelaram, quantos não cancelaram e qual o percentual)
+display(tabela["cancelou"].value_counts())
+
+# em percentual = normalizado
+display(tabela["cancelou"].value_counts(normalize=True))
+
+# Passo 5: Analise das causas dos cancelamentos (como as colunas impactam no cancelamento)
+import plotly.express as px
+
+# para cada coluna da nossa tabela
+for coluna in tabela.columns:
+    # cria o grafico
+    grafico = px.histogram(tabela, x=coluna, color="cancelou", text_auto=True)
+    # exibe o grafico
+    grafico.show()
+
+# causas de cancelamento
+
+# todos os clientes de contrato mensal, 
+    # vamos dar desconto nos contratos anuais e trimestrais
+# todos os cliente com mais de 20 dias de atraso cancelaram o serviço
+    # criar um sistema de cobrança dos clientes que com 10 dias de atraso alerte o cliente
+# todos os clientes que ligaram mais de 4x pro call center, cancelaram
+    # criar um alerta para um cliente quie ligou mais de 2x pro call center
+
+# analisar se eu resolver esses 3 problemas, quanto cai o cancelamento?
+
+# duraçãmo do contrato não pode ser ensal
+tabela = tabela[tabela["duracao_contrato"]!="Monthly"]
+
+# atrasos só podem ser de até 20 dias
+tabela = tabela[tabela["dias_atraso"]<=20]
+
+# ligações no call center só podem ser de ate 4 ligações
+tabela = tabela[tabela['ligacoes_callcenter']<=4]
+
+# em percentual = normalizado
+display(tabela["cancelou"].value_counts(normalize=True))
